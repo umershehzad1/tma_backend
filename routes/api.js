@@ -20,11 +20,19 @@ const upload  = multer({ storage: multer.memoryStorage({}), limits: { fileSize: 
 const userCtrl = require('../app/Http/Controllers/v1/UserController');
 const authCtrl = require('../app/Http/Controllers/v1/AuthController');
 const uploadCtrl = require('../app/Http/Controllers/v1/UploadController');
-
+const ProductCtrl = require('../app/Http/Controllers/v1/ProductController');
 /** Validation **/
 const userReq = require('../app/Http/Requests/UserValidator');
 
 const	app = express.Router();
+
+app.group("/product", (Route) => {
+    Route.get("/", ProductCtrl.show);
+    Route.post("/", ProductCtrl.create);
+    Route.delete("/:id", ProductCtrl.delete);
+    Route.put("/:id", ProductCtrl.update);
+    Route.get("/:id", ProductCtrl.getone);
+});
 
 app.group("/user", (Route) => {
 
