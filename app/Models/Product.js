@@ -3,15 +3,19 @@
 const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
 
-    image: {type: String, default: ""},
-    title: {type: String, required: true, unique: true},
-    description: {type: String},
-    price: {type: Number},
-    stock_status: {type: String},
-    discount: {type: Number,},
-    category: {type: String},
-    tags: {type: String},
-    delivery_status:{type: String}
+    name: {type: String, required: true, unique: true},
+    price: {type: Number, default: 5.00},
+    discount: {type: Number, default: 0},
+    discountDate: {type: Date},
+    size: {type: String, default: ""},
+    category: {type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    rating: {type: Number, default: 0},
+    quantity: {type: Number, default: 0},
+    description: {type: String, default: ""},
+    featuredImage: {type: String, default: ""},
+    images: {type: Array, default: []},
+    isFeatured: {type: Boolean, default: false},
+    tags: {type: Array, default: []}
 }, { timestamps: true } );
 
 mongoose.model('Product', schema);
