@@ -32,7 +32,7 @@ const createToken = (user) => {
     return jwt.sign({
 
         _id: user._id,
-        username: user.username,
+        name: user.name,
         email: user.email
     }, config.app.key, {expiresIn: JWT_EXPIRES_IN});
 }
@@ -42,7 +42,7 @@ let o = {}
 o.signup = async (req, res, next) => {
 
     try{
-        const user = await User.findOne({ $or: [{email: req.body.email}, {username: req.body.username}]});
+        const user = await User.findOne({email: req.body.email});
 
         if(user){
 
@@ -58,7 +58,7 @@ o.signup = async (req, res, next) => {
         
         let newUser = new User({
 
-            username: req.body.username,
+            name: req.body.name,
             email: req.body.email,
             password: password
         })
@@ -84,7 +84,7 @@ o.signup = async (req, res, next) => {
 o.login = async (req, res, next) => {
 
     try{
-        const user = await User.findOne({ $or: [{email: req.body.emailOrUsername}, {username: req.body.emailOrUsername}] }).select('_id username email password roles phone address image xp threshold rank')
+        const user = await User.findOne({ email: req.body.email }).select('_id name email password roles phone billingInfo shippingInfo')
         
         if(!user){
 
@@ -144,21 +144,11 @@ o.edit = async (req, res, next) => {
     try{
 
         let properties = {};
-        (req.body.address)  ?  properties["address"]  = req.body.address  : "";
-        (req.body.phone)    ?  properties["phone"]    = req.body.phone    : "";
-        (req.body.image)    ?  properties["image"]    = req.body.image    : "";
-
-        if(req.body.username){
-            const user = await User.findOne({username: req.body.username});
-            if(user && user._id != req.decoded._id){ // if another user have this username
-                console.log(1);
-                return json.errorResponse(res, 'Username Already Exist!', 409)
-            }else if(user && user._id == req.decoded._id && user.username != req.body.username){ // if you are the user and you updated another username
-                properties["username"] = req.body.username    
-            }else if(!user){ // if user not exists
-                properties["username"] = req.body.username  
-            }
-        }
+        (req.body.name)         ?  properties["name"]          = req.body.name  : "";
+        (req.body.billingInfo)  ?  properties["billingInfo"]   = req.body.billingInfo  : "";
+        (req.body.shippingInfo) ?  properties["shippingInfo"]  = req.body.shippingInfo  : "";
+        (req.body.phone)        ?  properties["phone"]         = req.body.phone    : "";
+        (req.body.image)        ?  properties["image"]         = req.body.image    : "";
 
         const updatedUser = await User.findOneAndUpdate({_id: req.decoded._id}, { $set: properties}, { upsert: true, new: true })
 

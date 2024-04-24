@@ -13,4 +13,4 @@ const schema = new mongoose.Schema({
     product: {type: [mongoose.Schema.Types.ObjectId], ref: "Product", default: [] },
 }, { timestamps: true } );
 
-mongoose.model('Product', schema);
+mongoose.model('Order', schema);

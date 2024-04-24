@@ -12,9 +12,9 @@
 */
 
 const express = require('express');
-              require('express-group-routes');
+                require('express-group-routes');
 const multer  = require('multer');
-const upload  = multer({ storage: multer.memoryStorage({}), limits: { fileSize: 500000000 }});
+const upload  = multer({ storage: multer.memoryStorage({}), limits: { fileSize: 5000000 }});
      
 /** Controllers **/
 const userCtrl = require('../app/Http/Controllers/v1/UserController');
@@ -24,15 +24,7 @@ const ProductCtrl = require('../app/Http/Controllers/v1/ProductController');
 /** Validation **/
 const userReq = require('../app/Http/Requests/UserValidator');
 
-const	app = express.Router();
-
-app.group("/product", (Route) => {
-    Route.get("/", ProductCtrl.show);
-    Route.post("/", ProductCtrl.create);
-    Route.delete("/:id", ProductCtrl.delete);
-    Route.put("/:id", ProductCtrl.update);
-    Route.get("/:id", ProductCtrl.getone);
-});
+const app = express.Router();
 
 app.group("/user", (Route) => {
 
@@ -48,5 +40,13 @@ app.group("/user", (Route) => {
 app.group("/upload", (Route) => {
 
     Route.post("/", authCtrl.authenticate, upload.single('attachment'), uploadCtrl.upload);
+});
+
+app.group("/product", (Route) => {
+    
+    Route.get("/", ProductCtrl.getAll);
+    Route.get("/:id", ProductCtrl.detail);
+    Route.post("/", ProductCtrl.create);
+    Route.put("/:id", ProductCtrl.update);
 });
 module.exports = app;
