@@ -21,6 +21,7 @@ const userCtrl = require('../app/Http/Controllers/v1/UserController');
 const authCtrl = require('../app/Http/Controllers/v1/AuthController');
 const uploadCtrl = require('../app/Http/Controllers/v1/UploadController');
 const ProductCtrl = require('../app/Http/Controllers/v1/ProductController');
+const CategoryCtrl = require('../app/Http/Controllers/v1/CategoryController');
 /** Validation **/
 const userReq = require('../app/Http/Requests/UserValidator');
 
@@ -49,4 +50,12 @@ app.group("/product", (Route) => {
     Route.post("/", ProductCtrl.create);
     Route.put("/:id", ProductCtrl.update);
 });
+
+app.group("/category", (Route) => {
+    
+    Route.get("/", CategoryCtrl.getAll);
+    Route.post("/", CategoryCtrl.create);
+    Route.put("/:id", CategoryCtrl.update);
+});
+
 module.exports = app;
