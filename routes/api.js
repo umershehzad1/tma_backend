@@ -56,6 +56,7 @@ app.group("/category", (Route) => {
     Route.get("/", CategoryCtrl.getAll);
     Route.post("/", CategoryCtrl.create);
     Route.put("/:id", CategoryCtrl.update);
+    Route.delete("/:id", CategoryCtrl.delete);
 });
 
 module.exports = app;
