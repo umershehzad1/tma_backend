@@ -49,6 +49,7 @@ app.group("/product", (Route) => {
     Route.get("/:id", ProductCtrl.detail);
     Route.post("/", ProductCtrl.create);
     Route.put("/:id", ProductCtrl.update);
+    Route.delete("/:id", ProductCtrl.delete);
 });
 
 app.group("/category", (Route) => {
