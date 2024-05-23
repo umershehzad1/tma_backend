@@ -2,23 +2,27 @@
 
 const mongoose = require("mongoose");
 const Category = mongoose.model("Category");
+const Product = mongoose.model("Product");
 const json = require("../../../Traits/ApiResponser");
 
 let o = {};
 
 o.getAll = async (req, res) => {
-
     try {
+        const categories = await Category.find({}).lean(); // Use lean() to get plain JavaScript objects instead of mongoose documents
+        
+        // Populate products for each category and count the number of products
+        const categoriesWithProducts = await Promise.all(categories.map(async (category) => {
+            const productsCount = await Product.countDocuments({ category: category._id });
+            category.productsCount = productsCount;
+            return category;
+        }));
 
-        const categories = await Category.find({});
-
-        json.successResponse(res, categories, 200);
-
+        // Send response
+        json.successResponse(res, categoriesWithProducts, 200);
     } catch (err) {
-
         return json.errorResponse(res, err);
     }
-
 };
 
 o.create = async (req, res) => {
@@ -63,7 +67,7 @@ o.update = async (req, res) => {
 
         let properties = {};
         (req.body.name)         ?  properties["name"]          = req.body.name          : "";
-        (req.body.image)        ?  properties["image"]         = req.body.image         : "";
+        (req.body.image)        ?  properties["image"]         = req.body.image         : properties["image"]  ="";
 
         const updatedCategory = await Category.findOneAndUpdate({_id: req.params.id}, { $set: properties}, { new: true })
 

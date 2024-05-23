@@ -40,7 +40,7 @@ app.group("/user", (Route) => {
 
 app.group("/upload", (Route) => {
 
-    Route.post("/", authCtrl.authenticate, upload.single('attachment'), uploadCtrl.upload);
+    Route.post("/", upload.single('attachment'), uploadCtrl.upload);
 });
 
 app.group("/product", (Route) => {

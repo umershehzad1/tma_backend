@@ -85,7 +85,7 @@ o.update = async (req, res) => {
     req.body.featuredImage
       ? (properties["featuredImage"] = req.body.featuredImage)
       : "";
-    req.body.images ? (properties["images"] = req.body.images) : "";
+    req.body.images ? (properties["images"] = req.body.images) : properties["images"]  =[];
     req.body.isFeatured ? (properties["isFeatured"] = req.body.isFeatured) : "";
     req.body.tags ? (properties["tags"] = req.body.tags) : "";
 
