@@ -25,6 +25,29 @@ o.getAll = async (req, res) => {
     }
 };
 
+
+o.getOne = async (req, res) => {
+
+    try {
+
+        const categories = await Category.findOne({ _id: req.params.id })
+
+        if (!categories) {
+
+            return json.errorResponse(res, 'No Category found!', 404)
+        }
+
+        json.showOne(res, Category, 200)
+
+    } catch (err) {
+
+        return json.errorResponse(res, err)
+    }
+
+}
+
+ 
+
 o.create = async (req, res) => {
 
     try {

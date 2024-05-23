@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const Product = mongoose.model("Product");
+const Category = mongoose.model("Category");
 const json = require("../../../Traits/ApiResponser");
 
 let o = {};
@@ -45,6 +46,26 @@ o.getAll = async (req, res) => {
     return json.errorResponse(res, err);
   }
 };
+
+o.getAllByCategory = async (req, res) => {
+  try {
+    // Convert hyphens to spaces in the category parameter
+    const categoryName = req.params.category.replace(/-/g, ' ');
+    
+    const category = await Category.findOne({ name: categoryName });
+
+    if (!category) {
+      return json.errorResponse(res, "Product Not Exist!", 404);
+    }
+
+    const products = await Product.find({ category }).populate("category");
+
+    json.successResponse(res, { category: category, products: products }, 200);
+  } catch (err) {
+    return json.errorResponse(res, err);
+  }
+};
+
 
 o.detail = async (req, res) => {
   try {
