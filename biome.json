@@ -13,7 +13,7 @@
                   }
       }
     },
-    "ignore": []
+    "ignore": ["/dist"]
   },
   "vcs": {
     "enabled": true,
