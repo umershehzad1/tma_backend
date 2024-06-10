@@ -45,3 +45,21 @@ export const addCollectionByAdmin = z.object({
 		required_error: "handle is required",
 	}),
 });
+
+export const addProductByAdmin = z.object({
+	price: z.string({
+		required_error: "price is required",
+	}),
+	handle: z.string({
+		required_error: "handle is required",
+	}),
+	title: z.string({
+		required_error: "title is required",
+	}),
+	description: z.string({
+		required_error: "description is required",
+	}),
+	collectionId: z.string({
+		required_error: "collectionId is required!",
+	}),
+});

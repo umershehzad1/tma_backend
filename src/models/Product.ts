@@ -1,15 +1,65 @@
-import { Model, Table, Column, DataType } from "sequelize-typescript";
+import {
+	Model,
+	Table,
+	Column,
+	DataType,
+	ForeignKey,
+	BelongsTo,
+	HasMany,
+} from "sequelize-typescript";
+import Collection from "@model/Collection";
+import ProductVariants from "@model/ProductVariants";
+import ProductImage from "@model/ProductImage";
 interface IProduct {
-	available: boolean;
-	featured_image: string;
+	available?: boolean;
+	featured_image?: string;
 	price: number;
 	handle: string;
 	title: string;
 	description: string;
-	status: "active" | "draft";
+	status?: "active" | "draft";
+	collectionId: number;
 }
 @Table({
 	tableName: "products",
 	timestamps: true,
 })
-export default class Product extends Model<IProduct> {}
+export default class Product extends Model<IProduct> {
+	@Column({
+		allowNull: false,
+		type: DataType.INTEGER,
+		primaryKey: true,
+		autoIncrement: true,
+	})
+	id!: number;
+	@Column({
+		type: DataType.BOOLEAN,
+		defaultValue: true,
+	})
+	available!: boolean;
+	@Column
+	featured_image!: string;
+	@Column
+	price!: number;
+	@Column
+	handle!: string;
+	@Column
+	title!: string;
+	@Column
+	description!: string;
+	@Column({
+		type: DataType.ENUM("active", "draft"),
+		defaultValue: "active",
+		allowNull: false,
+	})
+	status!: "active" | "draft";
+	@ForeignKey(() => Collection)
+	@Column
+	collectionId!: number;
+	@BelongsTo(() => Collection)
+	collection!: Collection;
+	@HasMany(() => ProductVariants)
+	variants!: ProductVariants[];
+	@HasMany(() => ProductImage)
+	images!: ProductImage[];
+}

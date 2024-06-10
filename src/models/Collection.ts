@@ -1,10 +1,11 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import Product from "@model/Product";
 interface ICollection {
 	title: string;
 	collection_url: string;
 	description: string;
 	image: string;
-	id: string;
+	id?: string;
 	tags: string;
 	handle: string;
 }
@@ -12,7 +13,7 @@ interface ICollection {
 	tableName: "collections",
 })
 export default class Collection extends Model<
-	Omit<ICollection, "id" | "image" | "collection_url">
+	Omit<ICollection, "image" | "collection_url">
 > {
 	@Column({
 		type: DataType.INTEGER,
@@ -49,4 +50,6 @@ export default class Collection extends Model<
 		type: DataType.STRING,
 	})
 	tags!: string;
+	@HasMany(() => Product)
+	products!: Product[];
 }

@@ -3,6 +3,7 @@ import type {
 	adminSignUpSchema,
 	adminLoginSchema,
 	addCollectionByAdmin,
+	addProductByAdmin,
 } from "@schema/admin";
 import type { z } from "zod";
 // import type { TokenPayload } from "@type/jwt";
@@ -26,3 +27,4 @@ export type TokenPayload = {
 export type IAdminUser = z.infer<typeof adminSignUpSchema>;
 export type IAdminLogin = z.infer<typeof adminLoginSchema>;
 export type ICollectionByAdmin = z.infer<typeof addCollectionByAdmin>;
+export type IProductByAdmin = z.infer<typeof addProductByAdmin>;
