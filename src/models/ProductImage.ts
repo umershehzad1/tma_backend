@@ -10,7 +10,7 @@ import Product from "@model/Product";
 interface IProductImage {
 	image_url: string;
 	product_id: number;
-	id: number;
+	id?: number;
 }
 @Table({
 	tableName: "product_images",

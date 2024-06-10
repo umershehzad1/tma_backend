@@ -1,3 +1,4 @@
+import path from "node:path";
 import express from "express";
 import { APP_CONSTANTS } from "@config/app";
 import { sequelize } from "@utils/sequelize";
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", MAIN_ROUTER);
+app.use("/data", express.static(path.join(__dirname, "../data")));
 
 (async () => {
 	try {

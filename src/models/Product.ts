@@ -16,6 +16,7 @@ interface IProduct {
 	price: number;
 	handle: string;
 	title: string;
+	quantity: number;
 	description: string;
 	status?: "active" | "draft";
 	collectionId: number;
@@ -47,6 +48,8 @@ export default class Product extends Model<IProduct> {
 	title!: string;
 	@Column
 	description!: string;
+	@Column
+	quantity!: number;
 	@Column({
 		type: DataType.ENUM("active", "draft"),
 		defaultValue: "active",

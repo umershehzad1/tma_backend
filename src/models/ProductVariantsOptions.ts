@@ -12,7 +12,7 @@ interface IProductVariantOptions {
 	name: string;
 	id: number;
 	variant_id: number;
-	image_url?: string;
+	image_url: string;
 	price: number;
 	quantity: number;
 }

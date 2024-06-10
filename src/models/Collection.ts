@@ -6,14 +6,13 @@ interface ICollection {
 	description: string;
 	image: string;
 	id?: string;
-	tags: string;
 	handle: string;
 }
 @Table({
 	tableName: "collections",
 })
 export default class Collection extends Model<
-	Omit<ICollection, "image" | "collection_url">
+	Omit<ICollection, "collection_url">
 > {
 	@Column({
 		type: DataType.INTEGER,
@@ -49,7 +48,6 @@ export default class Collection extends Model<
 	@Column({
 		type: DataType.STRING,
 	})
-	tags!: string;
-	@HasMany(() => Product)
+	@HasMany(() => Product, { as: "product_list" })
 	products!: Product[];
 }

@@ -38,12 +38,27 @@ export const addCollectionByAdmin = z.object({
 	description: z.string({
 		required_error: "description is required",
 	}),
-	tags: z.string({
-		required_error: "tags is required",
-	}),
 	handle: z.string({
-		required_error: "handle is required",
+		required_error: "Handle is required",
 	}),
+});
+
+const variantsOptions = z.object({
+	name: z.string({
+		required_error: "variants name is required",
+	}),
+	quantity: z.string({
+		required_error: "variants quantity is required",
+	}),
+	price: z.string({
+		required_error: "variants price is required",
+	}),
+});
+const variantSchema = z.object({
+	name: z.string({
+		required_error: "variants name is required",
+	}),
+	options: z.array(variantsOptions),
 });
 
 export const addProductByAdmin = z.object({
@@ -62,4 +77,15 @@ export const addProductByAdmin = z.object({
 	collectionId: z.string({
 		required_error: "collectionId is required!",
 	}),
+	quantity: z.string({
+		required_error: "quantity is required",
+	}),
+	product_image_quantity: z.string({
+		required_error: "product_image_quantity is required!",
+	}),
+	variants: z
+		.array(variantSchema, {
+			required_error: "variants is required!",
+		})
+		.optional(),
 });

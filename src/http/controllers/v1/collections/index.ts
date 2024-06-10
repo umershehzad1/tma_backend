@@ -35,7 +35,7 @@ export async function getAllProductOfSingleCollection(
 			include: [
 				{
 					model: Product,
-					as: "products",
+					as: "product_list",
 					include: [
 						{
 							model: ProductImage,
