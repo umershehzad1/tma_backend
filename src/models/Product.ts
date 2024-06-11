@@ -12,7 +12,7 @@ import ProductVariants from "@model/ProductVariants";
 import ProductImage from "@model/ProductImage";
 interface IProduct {
 	available?: boolean;
-	featured_image?: string;
+	
 	price: number;
 	handle: string;
 	title: string;
@@ -31,6 +31,7 @@ export default class Product extends Model<IProduct> {
 		type: DataType.INTEGER,
 		primaryKey: true,
 		autoIncrement: true,
+		
 	})
 	id!: number;
 	@Column({
@@ -38,8 +39,6 @@ export default class Product extends Model<IProduct> {
 		defaultValue: true,
 	})
 	available!: boolean;
-	@Column
-	featured_image!: string;
 	@Column
 	price!: number;
 	@Column

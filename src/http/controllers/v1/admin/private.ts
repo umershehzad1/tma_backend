@@ -130,3 +130,40 @@ export async function addNewProduct(
 		});
 	}
 }
+
+export async function updateTheCollection(req: IAuthRequest<ICollectionByAdmin, {collection_id:string}>,
+	res: Response) {
+	try {
+		const { description, handle, title } = req.body;
+		const { collection_id } = req.params;
+		const handle_url = generateHandleCollection(handle);
+
+		const collection = await Collection.findByPk(Number(collection_id));
+
+		if (!collection) {
+			return res.status(404).send({
+				message: "No Collection is found on the collectionId",
+			});
+		}
+		const isFile = req.file?.filename as string
+		
+		await collection.update({
+			description,
+			handle: handle_url,
+			title,
+			...(isFile ? {image:isFile} : {})
+			
+		});
+		return res.status(200).json({
+			message: "Collection updated successfully",
+			data: collection,
+		});
+		
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send({
+			message: "Internal server error",
+			error,
+		});
+	}
+	 }

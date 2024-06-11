@@ -9,7 +9,9 @@ import MAIN_ROUTER from "./routes";
 const app = express();
 app.use(helmet());
 
-app.use(cors());
+app.use(cors({
+	allowedHeaders:"*"
+}));
 
 app.use(morgan("dev"));
 
@@ -22,6 +24,9 @@ app.use("/data", express.static(path.join(__dirname, "../data")));
 
 (async () => {
 	try {
+		// await sequelize.drop({
+		// 	cascade: true,
+		// });
 		await sequelize.sync({ alter: true });
 		console.log("Database is connected Successfully!");
 		app.listen(APP_CONSTANTS.port, () => {

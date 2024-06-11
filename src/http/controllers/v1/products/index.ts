@@ -4,6 +4,7 @@ import ProductImage from "@model/ProductImage";
 import ProductVariants from "@model/ProductVariants";
 import type { IAuthRequest } from "@type/index";
 import type { Response } from "express";
+import {  Op} from"sequelize"
 
 export async function getSingleProductById(
 	// biome-ignore lint/complexity/noBannedTypes: <explanation>
@@ -12,6 +13,7 @@ export async function getSingleProductById(
 ) {
 	try {
 		const { productId } = req.params;
+		console.log("Running Single Product Id", productId);
 		const product = await Product.findByPk(Number(productId), {
 			include: [
 				{
@@ -51,4 +53,40 @@ export async function getSingleProductById(
 			error,
 		});
 	}
+}
+
+
+export async function getAllProducts(req: IAuthRequest,
+	res: Response) {
+	try {
+		const products = await Product.findAll({
+			include: [
+				{
+					model: ProductImage,
+					as: "images",
+				},
+				{
+					model: ProductVariants,
+					as: "variants",
+					include: [
+						{
+							model: ProductVariantsOption,
+							as: "options",
+						},
+					],
+				},
+			],
+			
+		});
+		return res.status(200).send({
+			message: "Products fetched successfully",
+			data: products
+		})
+	} catch (error) {
+		return res.status(500).send({
+			message: "Internal server error",
+			error
+		})
+	}
+	
 }

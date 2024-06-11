@@ -5,11 +5,19 @@ import ProductVariants from "@model/ProductVariants";
 import ProductVariantOptions from "@model/ProductVariantsOptions";
 import type { IAuthRequest } from "@type/index";
 import type { Response } from "express";
-
+import { sequelize } from "@utils/sequelize";
 export async function getAllCollections(_req: IAuthRequest, res: Response) {
 	try {
 		const collections = await Collection.findAll({
-			raw: true,
+			
+			include: [
+				{
+					model: Product,
+					as: "product_list",
+					
+				}
+			],
+
 		});
 		return res.status(200).json({
 			message: "Collections fetched successfully",
