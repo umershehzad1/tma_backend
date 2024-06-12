@@ -12,14 +12,14 @@ import ProductVariants from "@model/ProductVariants";
 import ProductImage from "@model/ProductImage";
 interface IProduct {
 	available?: boolean;
-	
+	id?: number;
 	price: number;
 	handle: string;
 	title: string;
 	quantity: number;
 	description: string;
 	status?: "active" | "draft";
-	collectionId: number;
+	collectionId: number | null;
 }
 @Table({
 	tableName: "products",

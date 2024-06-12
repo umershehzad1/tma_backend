@@ -3,6 +3,7 @@ import Product from "@model/Product";
 import ProductImage from "@model/ProductImage";
 import ProductVariants from "@model/ProductVariants";
 import ProductVariantOptions from "@model/ProductVariantsOptions";
+import { Op } from "sequelize";
 import type {
 	IAuthRequest,
 	ICollectionByAdmin,
@@ -52,6 +53,7 @@ export async function addNewProduct(
 			quantity,
 			product_image_quantity,
 			variants,
+			product_status
 		} = req.body;
 		console.log({ variants });
 		// * All the files attached my multer
@@ -78,6 +80,7 @@ export async function addNewProduct(
 				title,
 				collectionId: Number(collectionId),
 				quantity: Number(quantity),
+				status:product_status
 			},
 			{
 				raw: true,
@@ -166,4 +169,143 @@ export async function updateTheCollection(req: IAuthRequest<ICollectionByAdmin, 
 			error,
 		});
 	}
-	 }
+}
+	 
+
+export async function updateProductByAdmin(
+	req: IAuthRequest<IProductByAdmin, { product_id: string }>,
+	res: Response,
+) {
+	const { collectionId, description, handle, price, product_image_quantity, product_status, quantity, title, images_removed, variants } = req.body;
+	const { product_id} = req.params;
+	const collection = await Collection.findByPk(Number(collectionId));
+	const handle_url = generateHandleCollection
+	(handle)
+	if (!collection) { 
+		return res.status(404).send({
+			message:"No Collection is found on the collectionId"
+		})
+	}
+
+	const product = await Product.findByPk(Number(product_id), {
+		include: [
+			ProductImage,
+		]
+	});
+	if (!product) {
+		return res.status(404).send({
+			message: "No Product is found on the product_id",
+		});
+	}
+
+	if (images_removed) { 
+		await ProductImage.destroy({
+			where: {
+				id: {
+					[Op.in]:JSON.parse(images_removed)
+				}
+			}
+		})
+	}
+	const files = req.files as Express.Multer.File[];
+	if (files) { 
+		const allImage: { image_url: string; product_id: number }[] =
+			files?.map((file) => ({
+				image_url: file.filename,
+				product_id: product.id,
+			}));
+		await ProductImage.bulkCreate(allImage);
+	}
+	await product.update({
+		collectionId: Number(collectionId),
+		description,
+		quantity: Number(quantity),
+		status:product_status,
+		title,
+		price: Number(price),
+		handle: handle_url,
+
+	})
+
+	return res.status(200).send({
+		message: "Product updated successfully",
+		data:product,
+	})
+
+
+
+}
+
+
+
+export async function deleteProductByAdmin(
+	req: IAuthRequest<{}, { product_id: string }>,
+	res: Response,
+) {
+	try {
+		const { product_id } = req.params;
+		const product = await Product.findByPk(Number(product_id), {
+			include: [
+				ProductImage,
+				{
+					model: ProductVariants,
+					include: [
+						ProductVariantOptions
+					]
+				}
+				
+			]
+		});
+		if (!product) { 
+			return res.status(404).send({
+				message: "No Product is found on the product_id",
+			});
+		}
+
+		await product.destroy();
+		return res.status(200).send({
+			message: "Product deleted successfully",
+		});
+	
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send({
+			message: "Internal server error",
+			error,
+		});
+	
+	
+	}
+}
+
+
+export async function deleteCollectionByAdmin(
+	req: IAuthRequest<{}, { collection_id: string }>,
+	res: Response,
+) {
+	try {
+		const { collection_id } = req.params;
+		const collection = await Collection.findByPk(Number(collection_id), {
+			include:[Product]
+		});
+		if (!collection) {
+			return res.status(404).send({
+				message: "No Collection is found on the collectionId",
+			});
+		}
+			await Product.update(
+			{ collectionId: null },
+			{ where: { collectionId: Number(collection_id) } }
+		);
+		await collection.destroy();
+		return res.status(200).send({
+			message: "Collection deleted successfully",
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).send({
+			message: "Internal server error",
+			error,
+		})
+	}
+}

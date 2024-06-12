@@ -37,11 +37,7 @@ export async function getSingleProductById(
 				message: "Product not found",
 			});
 		}
-		if (product.status === "draft") {
-			return res.status(400).send({
-				message: "Product is not active",
-			});
-		}
+
 		return res.status(200).send({
 			message: "Product fetched successfully",
 			data: product,

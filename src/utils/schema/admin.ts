@@ -74,6 +74,7 @@ export const addProductByAdmin = z.object({
 	description: z.string({
 		required_error: "description is required",
 	}),
+
 	collectionId: z.string({
 		required_error: "collectionId is required!",
 	}),
@@ -88,4 +89,8 @@ export const addProductByAdmin = z.object({
 			required_error: "variants is required!",
 		})
 		.optional(),
+	product_status: z.enum(["active", "draft"], {
+		required_error:"product_status is required",
+	}).default("active"),
+	images_removed: z.string().optional(),
 });
