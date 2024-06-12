@@ -41,7 +41,11 @@ export default class Product extends Model<IProduct> {
 	available!: boolean;
 	@Column
 	price!: number;
-	@Column
+	@Column({
+		allowNull: false,
+		unique: true,
+		type: DataType.STRING(255),
+	})
 	handle!: string;
 	@Column
 	title!: string;
