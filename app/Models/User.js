@@ -1,17 +1,28 @@
-'use strict'
-
-const mongoose = require('mongoose');
-const schema = new mongoose.Schema({
-
-	name: {type: String, required: true, trim: true, lowercase: true, trim: true },
-	email: {type: String, required: true, unique: true, lowercase: true, trim: true },
-	password: {type: String, required: true, select: false},
-	resetPasswordCode: {type: String, default: null},
-	resetPasswordExpires: {type: Date, default: Date},
-	phone: {type: String, default: ""},
-	billingInfo: {type: Array, default: []},
-	shippingInfo: {type: Array, default: []},
-	roles: {type: [String], default: ['user']}
-}, { timestamps: true } );
-
-mongoose.model('User', schema);
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  User.init({
+    name: DataTypes.STRING,
+    email: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    role: DataTypes.STRING,
+    deletedAt: DataTypes.DATE
+  }, {
+    sequelize,
+    modelName: 'User',
+    paranoid: true
+  });
+  return User;
+};

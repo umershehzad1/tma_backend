@@ -1,8 +1,6 @@
 'use strict'
 
 let jwt = require('jsonwebtoken');
-let mongoose = require('mongoose');
-let User = mongoose.model('User');
 
 const base64id = require('base64id')
 

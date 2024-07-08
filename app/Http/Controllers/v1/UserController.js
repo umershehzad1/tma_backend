@@ -1,12 +1,11 @@
 'use strict'
 
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const ejs = require("ejs");
 const path = require("path");
+require("../../../Models");
+const User = require("../../../Models/User");
 
 let config     = {}; 
 config.app = require('../../../../config/app');
@@ -38,6 +37,23 @@ const createToken = (user) => {
 }
 
 let o = {}
+
+o.test = async (req, res, next) => {
+
+    try{
+        const user = await User.create({
+            name: "Umer",
+            email: "umershehzad.st@gmail.com",
+            phone: "3432423",
+            role: "user"
+        });
+
+        console.log(user);
+    }catch(err){
+
+        return json.errorResponse(res, err)
+    }
+}
 
 o.signup = async (req, res, next) => {
 

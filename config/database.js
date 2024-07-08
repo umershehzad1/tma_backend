@@ -1,5 +1,5 @@
 'use strict'
-
+require('dotenv').config();
 module.exports = {
 
     /*
@@ -13,7 +13,7 @@ module.exports = {
     |
     */
 
-    'default' : process.env.DB_CONNECTION || 'mongodb',
+    'default' : process.env.DB_CONNECTION || 'postgres',
 
     /*
     |--------------------------------------------------------------------------
@@ -33,23 +33,43 @@ module.exports = {
 
     /*
     |--------------------------------------------------------------------------
-    | MongoDB Databases
+    | Postgres Databases
     |--------------------------------------------------------------------------
     |
-    | Mongodb is an open source, fast, and advanced key-value store that also
+    | Postgres is an open source, fast, and advanced key-value store that also
     | provides a richer set of commands than a typical key-value systems
     | such as APC or Memcached. Framwork makes it easy to dig right in.
     |
     */
 
-    'mongodb' : {
+    "development": {
 
-        'host' : process.env.DB_HOST || '127.0.0.1',
-        'port' : process.env.DB_PORT || '27017',
-        'database' : process.env.DB_DATABASE || 'angry',
-        'username' : process.env.DB_USERNAME || 'root',
-        'password' : process.env.DB_PASSWORD || 'secret',
-        'authSource': process.env.DB_AUTH_SOURCE || 'admin'
-    }
+        "username": process.env.DB_USERNAME || "root",
+        "password": process.env.DB_PASSWORD || null,
+        "database": process.env.DB_DATABASE || "postgres",
+        "host": process.env.DB_HOST || "127.0.0.1",
+        "port": process.env.DB_PORT || 5432,
+        "dialect": process.env.DB_CONNECTION || "postgres"
+    },
+
+    "test": {
+
+        "username": process.env.DB_USERNAME || "root",
+        "password": process.env.DB_PASSWORD || null,
+        "database": process.env.DB_DATABASE || "postgres",
+        "host": process.env.DB_HOST || "127.0.0.1",
+        "port": process.env.DB_PORT || 5432,
+        "dialect": process.env.DB_CONNECTION || "postgres"
+    },
+
+    "production": {
+
+        "username": process.env.DB_USERNAME || "root",
+        "password": process.env.DB_PASSWORD || null,
+        "database": process.env.DB_DATABASE || "postgres",
+        "host": process.env.DB_HOST || "127.0.0.1",
+        "port": process.env.DB_PORT || 5432,
+        "dialect": process.env.DB_CONNECTION || "postgres"
+    },
 
 }

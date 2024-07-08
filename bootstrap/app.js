@@ -14,8 +14,7 @@
  let path 	  		= require('path');
  
  let express  		= require('express');
- let mongoose 		= require('mongoose');
-				  	  require('./cache/services');
+				  	//   require('./cache/services');
 
  let favicon 		= require('serve-favicon');
  let helmet   		= require('helmet');

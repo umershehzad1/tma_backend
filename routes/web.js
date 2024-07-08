@@ -25,8 +25,6 @@ let	app = express.Router();
 
 app.group("/", (Route) => {
 
-    Route.get("/reset-password", userCtrl.resetPasswordPage);
-    Route.post("/reset-password", userReq.resetPassword, userReq.validate, userCtrl.resetPassword);
 });
 
 module.exports = app;

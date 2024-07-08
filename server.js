@@ -16,7 +16,6 @@
  */
 
  let express = require('express');
- let mongoose = require('mongoose');
  let autoload = require('./bootstrap/autoload');
 
  let app = express();
@@ -29,31 +28,12 @@
  * On Database Connection.
  */
 
- mongoose.Promise = global.Promise;
- 
- mongoose.set('useNewUrlParser', true);
- mongoose.set('useFindAndModify', false);
- mongoose.set('useCreateIndex', true);
- mongoose.set('useUnifiedTopology', true);
- mongoose.connect(`mongodb://${config.database.mongodb.username}:${config.database.mongodb.password}@${config.database.mongodb.host}:${config.database.mongodb.port}/${config.database.mongodb.database}?authSource=${config.database.mongodb.authSource}`);
- 
- mongoose.connection
- .on('connecting',      () => console.log('Connecting to database...'))
- .on('disconnecting',   () => console.log('Disconnecting to database...'))
- .on('disconnected',    () => console.log('Connection to the database has been disconnected'))
- .on('error',      (error) => console.log('Err:', error))
- .on('reconnected',     () => console.log('mongodb Reconnected'))
- .on('reconnectFailed', () => console.log('Reconnect failed'))
- .on('connected',       () => console.log('Connected to database...'))
- .on('close',           () => console.log('Connection has been closed...'))
- .once('open',          () => {
 
-  http.listen(config.app.port, () => {
-    console.log('Server Running on port '+config.app.port);
-   }); 
-   app.on('error', onError);
-   app.on('listening', onListening);
- })
+http.listen(config.app.port, () => {
+  console.log('Server Running on port '+config.app.port);
+  }); 
+  app.on('error', onError);
+  app.on('listening', onListening);
 
  
  /**
