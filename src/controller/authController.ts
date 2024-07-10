@@ -1,17 +1,25 @@
 import jwt from "jsonwebtoken";
-import User from "../db/models/index";
-import admin from "../firebase/firebase";
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-interface tokenInterface {
+import admin from "../firebase/firebase";
+import db from "../db/models/index";
+import catchAsyncErrors from "../middleware/catchAsyncErrors";
+import ErrorHandler from "../utils/errorHandler";
+
+interface TokenInterface {
   id: string;
-  role : string;
+  role: string;
 }
-const generateToken = (payload : tokenInterface) => {
+
+console.log(db.User)
+
+const User = db.user;
+const generateToken = (payload: TokenInterface) => {
   return jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
     expiresIn: process.env.JWT_EXPIRES_IN as string,
   });
 };
+
 /*
 path : https://localhost:4000/api/auth/sign-up
 body : {
@@ -20,18 +28,16 @@ body : {
   contactNumber : contactNumber,
 }
 */
-export const signupWithGoogle = async (req: Request, res: Response ): Promise<Response> => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const signupWithGoogle = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ErrorHandler(errors.array()[0].msg, 400));
+    }
+    
     const { token, name, role } = req.body;
     if (!token) {
-      return res.status(400).json({
-        message: "Please provide a token",
-      });
+      return next(new ErrorHandler("Provide token", 400));
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
@@ -39,9 +45,7 @@ export const signupWithGoogle = async (req: Request, res: Response ): Promise<Re
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
+      return next(new ErrorHandler("User already exists", 400));
     }
 
     const newUser = await User.create({
@@ -52,9 +56,7 @@ export const signupWithGoogle = async (req: Request, res: Response ): Promise<Re
     });
 
     if (!newUser) {
-      return res.status(400).json({
-        message: "Unable to create new user",
-      });
+      return next(new ErrorHandler("Unable to create new user", 400));
     }
 
     const result = newUser.toJSON();
@@ -63,65 +65,54 @@ export const signupWithGoogle = async (req: Request, res: Response ): Promise<Re
       message: "User created successfully",
       data: result,
     });
-  } catch (error: any) {
-    return res.status(500).json({
-      status: "error",
-      error: error.message,
-    });
   }
-};
+);
 
-export const signInWithGoogle = async (req: Request, res: Response): Promise<Response> => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const signInWithGoogle = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ErrorHandler(errors.array()[0].msg, 400));
+    }
+    
     const idToken = req.body.token;
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const { uid, email } = decodedToken;
+    const { email } = decodedToken;
 
     const existingUser = await User.findOne({ where: { email } });
     if (!existingUser) {
-      return res.status(400).json({
-        message: "User not found",
-      });
+      return next(new ErrorHandler("User not found", 400));
     }
 
     const token = generateToken({ id: existingUser.id, role: existingUser.role });
+
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
-      token: token,
-    });
-  } catch (error: any) {
-    console.error("Google Sign-In Error:", error);
-    return res.status(500).json({
-      status: "error",
-      error: error.message,
+      token,
     });
   }
-};
+);
 
 // Signup with Credentials Endpoint
-export const signupWithCredentials = async (req: Request, res: Response): Promise<Response> => {
-  try {
+export const signupWithCredentials = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ErrorHandler(errors.array()[0].msg, 400));
+    }
+    
     const { name, contactNumber, token, role } = req.body;
     if (!token) {
-      return res.status(400).json({
-        message: "Please provide a token",
-      });
+      return next(new ErrorHandler("Provide token", 400));
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
-    const { uid, email } = decodedToken;
+    const { email } = decodedToken;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
+      return next(new ErrorHandler("User already exists", 400));
     }
 
     const newUser = await User.create({
@@ -132,62 +123,45 @@ export const signupWithCredentials = async (req: Request, res: Response): Promis
     });
 
     if (!newUser) {
-      return res.status(400).json({
-        message: "Unable to create new user",
-      });
+      return next(new ErrorHandler("Unable to create new user", 400));
     }
 
     const result = newUser.toJSON();
     delete result.deletedAt;
+
     return res.status(201).json({
       message: "User created successfully",
       data: result,
     });
-  } catch (error: any) {
-    return res.status(500).json({
-      status: "error",
-      error: error.message,
-    });
   }
-};
-export const signInWithCredentials = async (req: Request, res: Response): Promise<Response> => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  try {
+);
+
+export const signInWithCredentials = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ErrorHandler(errors.array()[0].msg, 400));
+    }
+    
     const { token } = req.body;
     if (!token) {
-      return res.status(400).json({
-        message: "Please provide a token",
-      });
+      return next(new ErrorHandler("Provide token", 400));
     }
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    const { uid, email } = decodedToken;
-    const userExist = await User.findOne({
-      where: {
-        email,
-      },
-    });
 
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const { email } = decodedToken;
+
+    const userExist = await User.findOne({ where: { email } });
     if (!userExist) {
-      return res.status(400).json({
-        message: "User not found",
-      });
+      return next(new ErrorHandler("User not found", 400));
     }
-    const generateNewToken = generateToken({ id: userExist.id, role: userExist.role });
+
+    const newToken = generateToken({ id: userExist.id, role: userExist.role });
+
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
-      data: generateNewToken,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      status: "error",
-      error: error.message,
+      token: newToken,
     });
   }
-};
-
-
-
+);

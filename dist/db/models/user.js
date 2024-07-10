@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // user.ts
 const sequelize_1 = require("sequelize");
+const sequelize_2 = require("sequelize"); // Correct import for Sequelize
 class User extends sequelize_1.Model {
     static associate(models) {
         User.hasMany(models.Order, {
@@ -10,6 +11,11 @@ class User extends sequelize_1.Model {
         // Add other associations as needed
     }
 }
+const sequelize = new sequelize_2.Sequelize('database', 'username', 'password', {
+    dialect: 'postgres', // Example dialect, adjust as per your database type
+    host: 'localhost',
+    port: 5432,
+});
 User.init({
     id: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -33,7 +39,7 @@ User.init({
     google_token: sequelize_1.DataTypes.TEXT,
     stripe_customer_id: sequelize_1.DataTypes.STRING
 }, {
-    sequelize,
+    sequelize, // Use the correct sequelize instance here
     modelName: 'User',
 });
 exports.default = User;

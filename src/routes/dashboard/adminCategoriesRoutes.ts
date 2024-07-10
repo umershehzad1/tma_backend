@@ -10,5 +10,5 @@ router.delete('/deleteCategory/:id', adminAuthenticate, deleteCategoryController
 router.put('/updateCategory/:id', adminAuthenticate, upload.single("image"), updateCategoryController);
 
 // router.post('/resetPassword', verifyUser, resetPassword);
-module.exports = router;
+export default router;
 

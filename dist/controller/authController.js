@@ -14,9 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signInWithCredentials = exports.signupWithCredentials = exports.signInWithGoogle = exports.signupWithGoogle = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const index_1 = __importDefault(require("../db/models/index"));
-const firebase_1 = __importDefault(require("../firebase/firebase"));
 const express_validator_1 = require("express-validator");
+const firebase_1 = __importDefault(require("../firebase/firebase"));
+const index_1 = __importDefault(require("../db/models/index"));
+const catchAsyncErrors_1 = __importDefault(require("../middleware/catchAsyncErrors"));
+const errorHandler_1 = __importDefault(require("../utils/errorHandler"));
+console.log(index_1.default.User);
+const User = index_1.default.user;
 const generateToken = (payload) => {
     return jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET_KEY, {
         expiresIn: process.env.JWT_EXPIRES_IN,
@@ -30,162 +34,107 @@ body : {
   contactNumber : contactNumber,
 }
 */
-const signupWithGoogle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.signupWithGoogle = (0, catchAsyncErrors_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return next(new errorHandler_1.default(errors.array()[0].msg, 400));
     }
-    try {
-        const { token, name, role } = req.body;
-        if (!token) {
-            return res.status(400).json({
-                message: "Please provide a token",
-            });
-        }
-        const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
-        const { email } = decodedToken;
-        const existingUser = yield index_1.default.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({
-                message: "User already exists",
-            });
-        }
-        const newUser = yield index_1.default.create({
-            name,
-            email,
-            role: role || 'user',
-            google_token: token,
-        });
-        if (!newUser) {
-            return res.status(400).json({
-                message: "Unable to create new user",
-            });
-        }
-        const result = newUser.toJSON();
-        delete result.deletedAt;
-        return res.status(201).json({
-            message: "User created successfully",
-            data: result,
-        });
+    const { token, name, role } = req.body;
+    if (!token) {
+        return next(new errorHandler_1.default("Provide token", 400));
     }
-    catch (error) {
-        return res.status(500).json({
-            status: "error",
-            error: error.message,
-        });
+    const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
+    const { email } = decodedToken;
+    const existingUser = yield User.findOne({ where: { email } });
+    if (existingUser) {
+        return next(new errorHandler_1.default("User already exists", 400));
     }
-});
-exports.signupWithGoogle = signupWithGoogle;
-const signInWithGoogle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newUser = yield User.create({
+        name,
+        email,
+        role: role || 'user',
+        google_token: token,
+    });
+    if (!newUser) {
+        return next(new errorHandler_1.default("Unable to create new user", 400));
+    }
+    const result = newUser.toJSON();
+    delete result.deletedAt;
+    return res.status(201).json({
+        message: "User created successfully",
+        data: result,
+    });
+}));
+exports.signInWithGoogle = (0, catchAsyncErrors_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return next(new errorHandler_1.default(errors.array()[0].msg, 400));
     }
-    try {
-        const idToken = req.body.token;
-        const decodedToken = yield firebase_1.default.auth().verifyIdToken(idToken);
-        const { uid, email } = decodedToken;
-        const existingUser = yield index_1.default.findOne({ where: { email } });
-        if (!existingUser) {
-            return res.status(400).json({
-                message: "User not found",
-            });
-        }
-        const token = generateToken({ id: existingUser.id, role: existingUser.role });
-        return res.status(200).json({
-            success: true,
-            message: "User logged in successfully",
-            token: token,
-        });
+    const idToken = req.body.token;
+    const decodedToken = yield firebase_1.default.auth().verifyIdToken(idToken);
+    const { email } = decodedToken;
+    const existingUser = yield User.findOne({ where: { email } });
+    if (!existingUser) {
+        return next(new errorHandler_1.default("User not found", 400));
     }
-    catch (error) {
-        console.error("Google Sign-In Error:", error);
-        return res.status(500).json({
-            status: "error",
-            error: error.message,
-        });
-    }
-});
-exports.signInWithGoogle = signInWithGoogle;
+    const token = generateToken({ id: existingUser.id, role: existingUser.role });
+    return res.status(200).json({
+        success: true,
+        message: "User logged in successfully",
+        token,
+    });
+}));
 // Signup with Credentials Endpoint
-const signupWithCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { name, contactNumber, token, role } = req.body;
-        if (!token) {
-            return res.status(400).json({
-                message: "Please provide a token",
-            });
-        }
-        const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
-        const { uid, email } = decodedToken;
-        const existingUser = yield index_1.default.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({
-                message: "User already exists",
-            });
-        }
-        const newUser = yield index_1.default.create({
-            name,
-            email,
-            role: role || 'user',
-            phone: contactNumber,
-        });
-        if (!newUser) {
-            return res.status(400).json({
-                message: "Unable to create new user",
-            });
-        }
-        const result = newUser.toJSON();
-        delete result.deletedAt;
-        return res.status(201).json({
-            message: "User created successfully",
-            data: result,
-        });
-    }
-    catch (error) {
-        return res.status(500).json({
-            status: "error",
-            error: error.message,
-        });
-    }
-});
-exports.signupWithCredentials = signupWithCredentials;
-const signInWithCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.signupWithCredentials = (0, catchAsyncErrors_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return next(new errorHandler_1.default(errors.array()[0].msg, 400));
     }
-    try {
-        const { token } = req.body;
-        if (!token) {
-            return res.status(400).json({
-                message: "Please provide a token",
-            });
-        }
-        const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
-        const { uid, email } = decodedToken;
-        const userExist = yield index_1.default.findOne({
-            where: {
-                email,
-            },
-        });
-        if (!userExist) {
-            return res.status(400).json({
-                message: "User not found",
-            });
-        }
-        const generateNewToken = generateToken({ id: userExist.id, role: userExist.role });
-        return res.status(200).json({
-            success: true,
-            message: "User logged in successfully",
-            data: generateNewToken,
-        });
+    const { name, contactNumber, token, role } = req.body;
+    if (!token) {
+        return next(new errorHandler_1.default("Provide token", 400));
     }
-    catch (error) {
-        return res.status(500).json({
-            status: "error",
-            error: error.message,
-        });
+    const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
+    const { email } = decodedToken;
+    const existingUser = yield User.findOne({ where: { email } });
+    if (existingUser) {
+        return next(new errorHandler_1.default("User already exists", 400));
     }
-});
-exports.signInWithCredentials = signInWithCredentials;
+    const newUser = yield User.create({
+        name,
+        email,
+        role: role || 'user',
+        phone: contactNumber,
+    });
+    if (!newUser) {
+        return next(new errorHandler_1.default("Unable to create new user", 400));
+    }
+    const result = newUser.toJSON();
+    delete result.deletedAt;
+    return res.status(201).json({
+        message: "User created successfully",
+        data: result,
+    });
+}));
+exports.signInWithCredentials = (0, catchAsyncErrors_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        return next(new errorHandler_1.default(errors.array()[0].msg, 400));
+    }
+    const { token } = req.body;
+    if (!token) {
+        return next(new errorHandler_1.default("Provide token", 400));
+    }
+    const decodedToken = yield firebase_1.default.auth().verifyIdToken(token);
+    const { email } = decodedToken;
+    const userExist = yield User.findOne({ where: { email } });
+    if (!userExist) {
+        return next(new errorHandler_1.default("User not found", 400));
+    }
+    const newToken = generateToken({ id: userExist.id, role: userExist.role });
+    return res.status(200).json({
+        success: true,
+        message: "User logged in successfully",
+        token: newToken,
+    });
+}));

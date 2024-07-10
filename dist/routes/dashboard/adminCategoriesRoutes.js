@@ -13,4 +13,4 @@ router.get('/getAllCategories', adminAuth_1.adminAuthenticate, adminCategoriesCo
 router.delete('/deleteCategory/:id', adminAuth_1.adminAuthenticate, adminCategoriesController_1.deleteCategoryController);
 router.put('/updateCategory/:id', adminAuth_1.adminAuthenticate, multer_1.default.single("image"), adminCategoriesController_1.updateCategoryController);
 // router.post('/resetPassword', verifyUser, resetPassword);
-module.exports = router;
+exports.default = router;

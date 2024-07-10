@@ -61,6 +61,7 @@ fs
 })
     .forEach(file => {
     const model = require(path.join(__dirname, file)).default; // Import default export
+    console.log(model.name);
     db[model.name] = model(sequelize, sequelize_1.DataTypes); // Initialize model with sequelize instance
 });
 // Apply associations if defined

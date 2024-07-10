@@ -1,6 +1,6 @@
 // user.ts
 import { DataTypes, Model } from 'sequelize';
-import { Sequelize } from 'sequelize/types';
+import { Sequelize } from 'sequelize'; // Correct import for Sequelize
 
 interface UserAttributes {
   id: number;
@@ -37,6 +37,12 @@ class User extends Model<UserAttributes> implements UserAttributes {
   }
 }
 
+const sequelize = new Sequelize('database', 'username', 'password', {
+  dialect: 'postgres', // Example dialect, adjust as per your database type
+  host: 'localhost',
+  port: 5432,
+});
+
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -60,7 +66,7 @@ User.init({
   google_token: DataTypes.TEXT,
   stripe_customer_id: DataTypes.STRING
 }, {
-  sequelize,
+  sequelize, // Use the correct sequelize instance here
   modelName: 'User',
 });
 
