@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src/**/*"]
+"include": ["src/**/*.ts", "config/**/*.ts", "models/**/*.ts", "db/migrations/**/*.ts", "config/config.js", "config/database.js"], "src/db/models/favourite.js", "src/db/models/subscription.js"
 }

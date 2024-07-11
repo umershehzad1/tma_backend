@@ -1,8 +1,8 @@
 import catchAsyncErrors from "../../middleware/catchAsyncErrors";
 import ErrorHandler from "../../utils/errorHandler";
 import { NextFunction, Request, Response } from "express";
-import  Product  from "../../db/models/index";
-import  Category  from "../../db/models/index";
+import  Product  from "../../../db/models/index";
+import  Category  from "../../../db/models/index";
 // import { uploadImageToAzure, deleteImageFromAzure} from "../../utils/azureStorage";
 
 /*

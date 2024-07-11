@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import User from "../../db/models/index";
+import User from "../../../db/models/index";
 import dotenv from 'dotenv';
 
 dotenv.config({ path: `${process.cwd()}/.env` });

@@ -2,7 +2,9 @@
   "name": "firebase-backend",
   "version": "1.0.0",
   "main": "app.js",
+  "type": "module",
   "scripts": {
+    "sequelize": "sequelize",
     "build": "rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node ./dist/app.js",

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import  User  from "../db/models"; // Adjust the import path based on your actual file structure
+import  User  from "../../models"; // Adjust the import path based on your actual file structure
 import dotenv from 'dotenv';
 import ErrorHandler from "../utils/errorHandler";
 import catchAsyncErrors from "./catchAsyncErrors";

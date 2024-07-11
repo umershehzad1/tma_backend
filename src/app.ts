@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes';
+import authRoutes from '../routes/authRoutes';
 const app = express();
 const PORT = process.env.APP_PORT || 4000;
-import adminCategoriesRoutes from './routes/dashboard/adminCategoriesRoutes';
-import adminProductRoutes from './routes/dashboard/adminProductRoutes';
+import adminCategoriesRoutes from '../routes/dashboard/adminCategoriesRoutes';
+import adminProductRoutes from '../routes/dashboard/adminProductRoutes';
 
 app.use(cors());
 app.use(express.json());

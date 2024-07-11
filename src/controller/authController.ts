@@ -2,19 +2,15 @@ import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import admin from "../firebase/firebase";
-import db from "../db/models/index";
+import User from "../../db/models/user";
 import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/errorHandler";
-
 interface TokenInterface {
-  id: string;
+  id: number;
   role: string;
 }
 
-console.log(db.User)
-
-const User = db.user;
-const generateToken = (payload: TokenInterface) => {
+const generateToken = (payload: TokenInterface): string => {
   return jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
     expiresIn: process.env.JWT_EXPIRES_IN as string,
   });
@@ -42,15 +38,17 @@ export const signupWithGoogle = catchAsyncErrors(
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     const { email } = decodedToken;
-
+    if(!email){
+      return next(new ErrorHandler("Email is required", 400));
+    }
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return next(new ErrorHandler("User already exists", 400));
     }
-
-    const newUser = await User.create({
+    const newUser  = await User.create({
       name,
       email,
+
       role: role || 'user',
       google_token: token,
     });
@@ -58,9 +56,7 @@ export const signupWithGoogle = catchAsyncErrors(
     if (!newUser) {
       return next(new ErrorHandler("Unable to create new user", 400));
     }
-
     const result = newUser.toJSON();
-    delete result.deletedAt;
     return res.status(201).json({
       message: "User created successfully",
       data: result,
@@ -109,7 +105,9 @@ export const signupWithCredentials = catchAsyncErrors(
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     const { email } = decodedToken;
-
+    if(!email){
+      return next(new ErrorHandler("Email is required", 400));
+    }
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return next(new ErrorHandler("User already exists", 400));
@@ -127,7 +125,8 @@ export const signupWithCredentials = catchAsyncErrors(
     }
 
     const result = newUser.toJSON();
-    delete result.deletedAt;
+    // Ensure that deletedAt is a property in your User model or remove this line if not needed
+    // delete result.deletedAt;
 
     return res.status(201).json({
       message: "User created successfully",
